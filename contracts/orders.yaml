@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Harbor Orders
+  title: Orders
   version: 2026.09.0
   description: |
-    Order desk for Harbor, a home-goods merchant. Amounts are integer cents.
+    Order desk for a home-goods merchant. Amounts are integer cents.
     Deleting an order is permanent. Cancelling one leaves the invoice in place.
 servers:
   - url: http://127.0.0.1:18410
-    description: Local Harbor orders
+    description: Local orders
 security:
   - bearerAuth: []
 tags:
@@ -233,7 +233,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      description: Desk token. The Harbor mock expects the value in HARBOR_TOKEN.
+      description: Desk token. The mock expects the value in DEMO_TOKEN.
   parameters:
     id:
       name: id
@@ -316,7 +316,7 @@ components:
           description: Invoice on the billing desk.
         warehouseId:
           type: string
-          description: Warehouse code. Harbor does not join this field.
+          description: Warehouse code. This field is not a join.
         placedAt:
           type: string
           format: date-time

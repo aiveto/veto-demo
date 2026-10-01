@@ -1,4 +1,4 @@
-// Command show walks Harbor the way a person, a CLI, and Claude would.
+// Command show walks the catalog the way a person, a CLI, and Claude would.
 package main
 
 import (
@@ -66,7 +66,7 @@ func run() error {
 		return err
 	}
 
-	fmt.Print("Harbor\nThree desks. One catalog. The model proposes. Veto decides.\n")
+	fmt.Print("veto\nThree desks. One catalog. The model proposes. Veto decides.\n")
 
 	if err := s.catalog(); err != nil {
 		return err
@@ -194,7 +194,7 @@ func (s *show) pack() error {
 }
 
 func (s *show) relation(session *mcp.ClientSession) error {
-	fmt.Print("\n5  The next call is declared\n")
+	fmt.Print("\n5  Relations\n")
 	before := mustLog()
 	text, err := call(session, "capabilities_describe", map[string]any{"operation_id": "orders.get"})
 	if err != nil {
@@ -242,7 +242,7 @@ func (s *show) relation(session *mcp.ClientSession) error {
 }
 
 func (s *show) allowedWrite(session *mcp.ClientSession) error {
-	fmt.Print("\n6  A write that is allowed\n")
+	fmt.Print("\n6  Cancel reaches the desk\n")
 	preview, err := call(session, "capabilities_invoke", map[string]any{
 		"operation_id": "orders.cancel",
 		"preview":      true,
@@ -277,7 +277,7 @@ func (s *show) allowedWrite(session *mcp.ClientSession) error {
 }
 
 func (s *show) agentStops() error {
-	fmt.Print("\n7  The agent\n")
+	fmt.Print("\n7  The agent stops\n")
 	before := mustLog()
 	out, errText, err := s.command("preview", "--config", "veto.yaml", "--operation", "orders.delete", "--param", "id=10482")
 	if err != nil {
@@ -302,7 +302,7 @@ func (s *show) agentStops() error {
 }
 
 func (s *show) wireStops(session *mcp.ClientSession) error {
-	fmt.Print("\n8  The wire Claude uses\n")
+	fmt.Print("\n8  MCP stops the same way\n")
 	before := mustLog()
 	held, err := invoke(session, "orders.delete", map[string]any{"id": "10482"}, "")
 	if err != nil {
@@ -363,7 +363,7 @@ func (s *show) personApproves(session *mcp.ClientSession) error {
 }
 
 func (s *show) cases() error {
-	fmt.Print("\n10  The case\n")
+	fmt.Print("\n10  Eval\n")
 	before := mustLog().Deletes
 	out, errText, err := s.command("eval", "--config", "veto.yaml", "--case", "cases")
 	if err != nil {
@@ -393,7 +393,7 @@ func (s *show) connect() (*mcp.ClientSession, error) {
 	cmd.Env = os.Environ()
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
-	client := mcp.NewClient(&mcp.Implementation{Name: "harbor-show", Version: "0.1.0"}, nil)
+	client := mcp.NewClient(&mcp.Implementation{Name: "veto-demo", Version: "0.1.0"}, nil)
 	session, err := client.Connect(context.Background(), &mcp.CommandTransport{Command: cmd}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("mcp connect: %w\n%s", err, stderr.String())
@@ -452,14 +452,14 @@ func call(session *mcp.ClientSession, name string, args map[string]any) (string,
 }
 
 func prepareEnv(root string) {
-	if os.Getenv("HARBOR_TOKEN") == "" {
-		_ = os.Setenv("HARBOR_TOKEN", "harbor-demo-token")
+	if os.Getenv("DEMO_TOKEN") == "" {
+		_ = os.Setenv("DEMO_TOKEN", "demo-token")
 	}
 	if os.Getenv("VETO_APPROVAL_NONCE_DIR") == "" {
-		_ = os.Setenv("VETO_APPROVAL_NONCE_DIR", filepath.Join(root, ".harbor", "approvals"))
+		_ = os.Setenv("VETO_APPROVAL_NONCE_DIR", filepath.Join(root, ".demo", "approvals"))
 	}
 	if os.Getenv("VETO_TOKEN_DIR") == "" {
-		_ = os.Setenv("VETO_TOKEN_DIR", filepath.Join(root, ".harbor", "tokens"))
+		_ = os.Setenv("VETO_TOKEN_DIR", filepath.Join(root, ".demo", "tokens"))
 	}
 	_ = os.MkdirAll(os.Getenv("VETO_APPROVAL_NONCE_DIR"), 0o700)
 	_ = os.MkdirAll(os.Getenv("VETO_TOKEN_DIR"), 0o700)
@@ -506,11 +506,11 @@ func waitReady() error {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	return errors.New("harbor is not listening. Run make up in another terminal, or make demo")
+	return errors.New("the desks are not listening. Run make up in another terminal, or make demo")
 }
 
 func mustLog() hitLog {
-	resp, err := http.Get("http://127.0.0.1:18410/_harbor/log")
+	resp, err := http.Get("http://127.0.0.1:18410/_demo/log")
 	if err != nil {
 		return hitLog{}
 	}
@@ -534,7 +534,7 @@ func getStatus(url string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("HARBOR_TOKEN"))
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("DEMO_TOKEN"))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return 0, err

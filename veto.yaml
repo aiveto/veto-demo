@@ -6,4 +6,4 @@ contracts:
   - contracts/customers.yaml
   - contracts/invoices.yaml
 auth:
-  bearerAuth: HARBOR_TOKEN
+  bearerAuth: DEMO_TOKEN

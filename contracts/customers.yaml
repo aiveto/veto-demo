@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Harbor Customers
+  title: Customers
   version: 2026.09.0
   description: |
-    People who buy from Harbor. An order points here with customerId.
+    People who place orders. An order points here with customerId.
     This desk does not delete a customer.
 servers:
   - url: http://127.0.0.1:18411
-    description: Local Harbor customers
+    description: Local customers
 security:
   - bearerAuth: []
 tags:

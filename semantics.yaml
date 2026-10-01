@@ -1,4 +1,4 @@
 - operation: orders.delete
-  sentence: Retire a fulfilled Harbor order. The customer and the invoice stay. This call waits for a person.
+  sentence: Retire a fulfilled order. The customer and the invoice stay. This call waits for a person.
   synonyms:
     - scrap

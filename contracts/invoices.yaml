@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Harbor Billing
+  title: Billing
   version: 2026.09.0
   description: |
-    Invoices and payments for Harbor. Amounts are integer cents.
+    Invoices and payments. Amounts are integer cents.
     Voiding an invoice is a write. It is not a delete.
 servers:
   - url: http://127.0.0.1:18412
-    description: Local Harbor billing
+    description: Local billing
 security:
   - bearerAuth: []
 tags:

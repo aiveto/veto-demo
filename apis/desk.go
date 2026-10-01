@@ -1,5 +1,5 @@
-// Package harbor is the three desks behind the demo: orders, customers, and billing.
-package harbor
+// Package apis is the three desks behind the demo: orders, customers, and billing.
+package apis
 
 import (
 	"encoding/json"
@@ -13,7 +13,7 @@ const (
 	OrdersAddr    = "127.0.0.1:18410"
 	CustomersAddr = "127.0.0.1:18411"
 	InvoicesAddr  = "127.0.0.1:18412"
-	Token         = "harbor-demo-token"
+	Token         = "demo-token"
 )
 
 type (
@@ -144,7 +144,7 @@ func (d *Desk) Handler(service string) http.Handler {
 			writeJSON(w, http.StatusOK, map[string]string{"ok": "true", "service": service})
 			return
 		}
-		if service == "orders" && r.URL.Path == "/_harbor/log" && r.Method == http.MethodGet {
+		if service == "orders" && r.URL.Path == "/_demo/log" && r.Method == http.MethodGet {
 			d.mu.Lock()
 			calls := append([]Call(nil), d.calls...)
 			d.mu.Unlock()
@@ -166,7 +166,7 @@ func (d *Desk) Handler(service string) http.Handler {
 
 func (d *Desk) route(service string, w http.ResponseWriter, r *http.Request) int {
 	if r.Header.Get("Authorization") != "Bearer "+Token {
-		return problem(w, http.StatusUnauthorized, "Harbor wants the desk token")
+		return problem(w, http.StatusUnauthorized, "the desk wants its token")
 	}
 	switch service {
 	case "orders":

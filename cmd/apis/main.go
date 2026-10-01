@@ -11,22 +11,22 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/aiveto/veto-demo/harbor"
+	"github.com/aiveto/veto-demo/apis"
 )
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintf(os.Stderr, "harbor: %v\n", err)
+		fmt.Fprintf(os.Stderr, "desks: %v\n", err)
 		os.Exit(1)
 	}
 }
 
 func run() error {
-	desk := harbor.New()
+	desk := apis.New()
 	servers := []*http.Server{
-		{Addr: harbor.OrdersAddr, Handler: desk.Handler("orders")},
-		{Addr: harbor.CustomersAddr, Handler: desk.Handler("customers")},
-		{Addr: harbor.InvoicesAddr, Handler: desk.Handler("invoices")},
+		{Addr: apis.OrdersAddr, Handler: desk.Handler("orders")},
+		{Addr: apis.CustomersAddr, Handler: desk.Handler("customers")},
+		{Addr: apis.InvoicesAddr, Handler: desk.Handler("invoices")},
 	}
 	errc := make(chan error, len(servers))
 	for _, srv := range servers {
@@ -53,16 +53,16 @@ func run() error {
 	for _, srv := range servers {
 		_ = srv.Shutdown(shut)
 	}
-	fmt.Fprintln(os.Stderr, "harbor stopped")
+	fmt.Fprintln(os.Stderr, "desks stopped")
 	return nil
 }
 
 func waitReady() error {
 	deadline := time.Now().Add(3 * time.Second)
 	urls := []string{
-		"http://" + harbor.OrdersAddr + "/healthz",
-		"http://" + harbor.CustomersAddr + "/healthz",
-		"http://" + harbor.InvoicesAddr + "/healthz",
+		"http://" + apis.OrdersAddr + "/healthz",
+		"http://" + apis.CustomersAddr + "/healthz",
+		"http://" + apis.InvoicesAddr + "/healthz",
 	}
 	for time.Now().Before(deadline) {
 		ready := true
@@ -93,9 +93,9 @@ func banner() string {
 	}
 	veto := filepath.Join(dir, "bin", "veto")
 	cfg := filepath.Join(dir, "veto.yaml")
-	approvals := filepath.Join(dir, ".harbor", "approvals")
-	tokens := filepath.Join(dir, ".harbor", "tokens")
-	return fmt.Sprintf(`Harbor is listening.
+	approvals := filepath.Join(dir, ".demo", "approvals")
+	tokens := filepath.Join(dir, ".demo", "tokens")
+	return fmt.Sprintf(`The desks are listening. Veto is the catalog.
 
   orders     http://%s
   customers  http://%s
@@ -110,12 +110,12 @@ Claude or ChatGPT, same three tools:
 
 Env for that process:
 
-  HARBOR_TOKEN=%s
+  DEMO_TOKEN=%s
   VETO_APPROVAL_NONCE_DIR=%s
   VETO_TOKEN_DIR=%s
 
 The instruction to paste is prompts/claude.md.
 Another terminal: make show.
 
-`, harbor.OrdersAddr, harbor.CustomersAddr, harbor.InvoicesAddr, veto, cfg, harbor.Token, approvals, tokens)
+`, apis.OrdersAddr, apis.CustomersAddr, apis.InvoicesAddr, veto, cfg, apis.Token, approvals, tokens)
 }
