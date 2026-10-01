@@ -1,15 +1,15 @@
 # Harbor's APIs
 
-Imagine these three are already hosted. Veto is the `bin/veto` binary one directory up, built from the module in `go.mod`. It sits in front of them.
+Orders, customers, and billing, already hosted. Veto is `bin/veto` one directory up, built from the module in `go.mod`.
 
 | You want | File |
 | --- | --- |
-| Add a relationship between APIs | `relations.yaml` |
-| Add semantics, the words for a call | `semantics.yaml` |
-| Point veto at other contracts | `veto.yaml` |
-| Read the OpenAPI | `contracts/` |
-| See the process that hosts them here | `desks/` |
-| Tell Claude, Cursor, or ChatGPT what to do | `prompts/claude.md` |
-| The checks the CLI runs | `cases/` |
+| A relationship between APIs | `relations.yaml` |
+| Semantics, the words for a call | `semantics.yaml` |
+| Which contracts veto loads | `veto.yaml` |
+| The OpenAPI | `contracts/` |
+| This process | `desks/` |
+| The instruction for Claude, Cursor, or ChatGPT | `prompts/claude.md` |
+| The checks `veto eval` runs | `cases/` |
 
-From the repo root: `make demo` plays the story, `make cli` runs the veto CLI, `make mcp` leaves these APIs listening for Claude, Cursor, or ChatGPT.
+From the repo root, `make demo` plays the story. `make mcp` leaves these APIs listening and prints the config to paste. `make cli` runs the veto CLI.
