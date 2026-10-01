@@ -1,4 +1,4 @@
-// Command show walks the catalog the way a person, a CLI, and Claude would.
+// Command show walks app/ with the veto binary. The walk is this repository's demonstration.
 package main
 
 import (
@@ -115,7 +115,7 @@ The approved id ran once.
 
 func (s *show) catalog() error {
 	fmt.Print("\n1  Catalog\n")
-	out, errText, err := s.command("validate", "--config", "veto.yaml")
+	out, errText, err := s.command("validate", "--config", s.config())
 	if err != nil {
 		return fail("validate", out, errText, err)
 	}
@@ -123,7 +123,7 @@ func (s *show) catalog() error {
 		return fmt.Errorf("validate did not show the catalog and the joins\n%s", out)
 	}
 	fmt.Print(indent(out))
-	doc, errText, err := s.command("doctor", "--config", "veto.yaml")
+	doc, errText, err := s.command("doctor", "--config", s.config())
 	if err != nil {
 		return fail("doctor", doc, errText, err)
 	}
@@ -182,7 +182,7 @@ func (s *show) semantics(session *mcp.ClientSession) error {
 
 func (s *show) pack() error {
 	fmt.Print("\n4  Context pack\n")
-	out, errText, err := s.command("pack", "--config", "veto.yaml", "--message", "who placed order 10482")
+	out, errText, err := s.command("pack", "--config", s.config(), "--message", "who placed order 10482")
 	if err != nil {
 		return fail("pack", out, errText, err)
 	}
@@ -279,14 +279,14 @@ func (s *show) allowedWrite(session *mcp.ClientSession) error {
 func (s *show) agentStops() error {
 	fmt.Print("\n7  The agent stops\n")
 	before := mustLog()
-	out, errText, err := s.command("preview", "--config", "veto.yaml", "--operation", "orders.delete", "--param", "id=10482")
+	out, errText, err := s.command("preview", "--config", s.config(), "--operation", "orders.delete", "--param", "id=10482")
 	if err != nil {
 		return fail("preview delete", out, errText, err)
 	}
 	if !strings.Contains(out, `"approval_required": true`) && !strings.Contains(out, `"approval_required":true`) {
 		return fmt.Errorf("preview did not hold the delete\n%s", out)
 	}
-	trace, errText, err := s.command("replay", "--config", "veto.yaml", "--message", "Delete order 10482")
+	trace, errText, err := s.command("replay", "--config", s.config(), "--message", "Delete order 10482")
 	if err != nil {
 		return fail("replay", trace, errText, err)
 	}
@@ -365,7 +365,7 @@ func (s *show) personApproves(session *mcp.ClientSession) error {
 func (s *show) cases() error {
 	fmt.Print("\n10  Eval\n")
 	before := mustLog().Deletes
-	out, errText, err := s.command("eval", "--config", "veto.yaml", "--case", "cases")
+	out, errText, err := s.command("eval", "--config", s.config(), "--case", filepath.Join(s.root, "app", "cases"))
 	if err != nil {
 		return fail("eval", out, errText, err)
 	}
@@ -374,6 +374,10 @@ func (s *show) cases() error {
 	}
 	fmt.Print("    veto eval  delete still requires confirmation, and the pack still omits the spec.\n")
 	return nil
+}
+
+func (s *show) config() string {
+	return filepath.Join(s.root, "app", "veto.yaml")
 }
 
 func (s *show) command(args ...string) (string, string, error) {
@@ -388,7 +392,7 @@ func (s *show) command(args ...string) (string, string, error) {
 }
 
 func (s *show) connect() (*mcp.ClientSession, error) {
-	cmd := exec.Command(s.veto, "serve", "--config", filepath.Join(s.root, "veto.yaml"), "--stdio")
+	cmd := exec.Command(s.veto, "serve", "--config", s.config(), "--stdio")
 	cmd.Dir = s.root
 	cmd.Env = os.Environ()
 	var stderr bytes.Buffer
@@ -472,8 +476,8 @@ func findRoot() (string, error) {
 		return "", err
 	}
 	for {
-		if _, err := os.Stat(filepath.Join(dir, "veto.yaml")); err == nil {
-			if _, err := os.Stat(filepath.Join(dir, "contracts", "orders.yaml")); err == nil {
+		if _, err := os.Stat(filepath.Join(dir, "app", "veto.yaml")); err == nil {
+			if _, err := os.Stat(filepath.Join(dir, "app", "contracts", "orders.yaml")); err == nil {
 				return dir, nil
 			}
 		}

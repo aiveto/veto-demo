@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/aiveto/veto-demo/apis"
+	"github.com/aiveto/veto-demo/app/desks"
 )
 
 func main() {
@@ -22,11 +22,11 @@ func main() {
 }
 
 func run() error {
-	desk := apis.New()
+	desk := desks.New()
 	servers := []*http.Server{
-		{Addr: apis.OrdersAddr, Handler: desk.Handler("orders")},
-		{Addr: apis.CustomersAddr, Handler: desk.Handler("customers")},
-		{Addr: apis.InvoicesAddr, Handler: desk.Handler("invoices")},
+		{Addr: desks.OrdersAddr, Handler: desk.Handler("orders")},
+		{Addr: desks.CustomersAddr, Handler: desk.Handler("customers")},
+		{Addr: desks.InvoicesAddr, Handler: desk.Handler("invoices")},
 	}
 	errc := make(chan error, len(servers))
 	for _, srv := range servers {
@@ -60,9 +60,9 @@ func run() error {
 func waitReady() error {
 	deadline := time.Now().Add(3 * time.Second)
 	urls := []string{
-		"http://" + apis.OrdersAddr + "/healthz",
-		"http://" + apis.CustomersAddr + "/healthz",
-		"http://" + apis.InvoicesAddr + "/healthz",
+		"http://" + desks.OrdersAddr + "/healthz",
+		"http://" + desks.CustomersAddr + "/healthz",
+		"http://" + desks.InvoicesAddr + "/healthz",
 	}
 	for time.Now().Before(deadline) {
 		ready := true
@@ -87,15 +87,12 @@ func waitReady() error {
 }
 
 func banner() string {
-	dir, err := os.Getwd()
-	if err != nil {
-		dir = "."
-	}
-	veto := filepath.Join(dir, "bin", "veto")
-	cfg := filepath.Join(dir, "veto.yaml")
-	approvals := filepath.Join(dir, ".demo", "approvals")
-	tokens := filepath.Join(dir, ".demo", "tokens")
-	return fmt.Sprintf(`The desks are listening. Veto is the catalog.
+	repo := repoRoot()
+	veto := filepath.Join(repo, "bin", "veto")
+	cfg := filepath.Join(repo, "app", "veto.yaml")
+	approvals := filepath.Join(repo, ".demo", "approvals")
+	tokens := filepath.Join(repo, ".demo", "tokens")
+	return fmt.Sprintf(`Your services are listening. Veto is %s.
 
   orders     http://%s
   customers  http://%s
@@ -104,6 +101,7 @@ func banner() string {
 Order 10482 is Mara Ellison's wool coat. customerId is cus_mara. invoiceId is inv_2291.
 warehouseId is wh_sfo_1 and is not a join.
 
+Your config is %s.
 Claude or ChatGPT, same three tools:
 
   %s serve --config %s --stdio
@@ -114,8 +112,25 @@ Env for that process:
   VETO_APPROVAL_NONCE_DIR=%s
   VETO_TOKEN_DIR=%s
 
-The instruction to paste is prompts/claude.md.
+The instruction to paste is app/prompts/claude.md.
 Another terminal: make show.
 
-`, apis.OrdersAddr, apis.CustomersAddr, apis.InvoicesAddr, veto, cfg, apis.Token, approvals, tokens)
+`, veto, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, cfg, veto, cfg, desks.Token, approvals, tokens)
+}
+
+func repoRoot() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "."
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "app", "veto.yaml")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return dir
+		}
+		dir = parent
+	}
 }

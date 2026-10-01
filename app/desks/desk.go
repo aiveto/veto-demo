@@ -1,5 +1,5 @@
-// Package apis is the three desks behind the demo: orders, customers, and billing.
-package apis
+// Package desks is the sample services. Orders, customers, and billing speak the contracts in app/contracts.
+package desks
 
 import (
 	"encoding/json"
