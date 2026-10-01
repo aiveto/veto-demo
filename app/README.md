@@ -4,9 +4,9 @@ The three APIs that run Harbor's online business: orders, customers, and billing
 
 | You want | File |
 | --- | --- |
-| A relationship between APIs | `relations.yaml` |
-| Semantics, the words for a call | `semantics.yaml` |
-| Which contracts veto loads | `veto.yaml` |
+| A link from one API to another | `relations.yaml` |
+| The words for a call | `semantics.yaml` |
+| The file that names the APIs | `veto.yaml` |
 | The OpenAPI | `contracts/` |
 | This process | `desks/` |
 | The instruction for Claude, Cursor, or ChatGPT | `prompts/claude.md` |
