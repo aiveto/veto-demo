@@ -6,11 +6,11 @@ Imagine Harbor sells home goods. The three APIs that run that online business ar
 make demo
 ```
 
-That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`. The module is private, so `make` fetches it with your GitHub credentials.
+That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
 
 ## The story
 
-`make demo` plays one afternoon at Harbor.
+`make demo` runs it.
 
 The business has twenty-five operations. The agent gets three tools: search, describe, and invoke.
 
