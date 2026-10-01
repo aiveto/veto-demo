@@ -1,6 +1,6 @@
 # veto demo
 
-Harbor sells home goods. Three APIs are already hosted under `app/`: orders, customers, and billing. Veto sits in front of them.
+Imagine Harbor sells home goods. Three APIs are already hosted under `app/`: orders, customers, and billing. Veto sits in front of them.
 
 ```bash
 make demo
