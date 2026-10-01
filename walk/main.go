@@ -510,7 +510,7 @@ func waitReady() error {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
-	return errors.New("the desks are not listening. Run make up in another terminal, or make demo")
+	return errors.New("the APIs are not listening. Run make mcp in another terminal, or make demo")
 }
 
 func mustLog() hitLog {

@@ -14,7 +14,7 @@ That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
 
 The business has twenty-five operations. The agent gets three tools: search, describe, and invoke.
 
-"Retire order" and "scrap order" both find the delete. Retire is already known. Scrap is a word you added in `app/semantics.yaml`, beside the sentence that this call waits for a person.
+"Retire order" and "scrap order" both find the delete. Retire is already known. Scrap is an extra word in `app/semantics.yaml`, beside the sentence that this call waits for a person.
 
 Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. Reading it also reads Mara, and her paid invoice, because those links are written in `app/relations.yaml`. The warehouse id on the order is not a link, so nothing calls it.
 
