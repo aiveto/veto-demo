@@ -62,11 +62,10 @@ With the APIs up in another terminal (`make mcp`):
 ```bash
 bin/veto validate --config app/veto.yaml
 bin/veto preview --config app/veto.yaml --operation orders.delete --param id=10482
-bin/veto approve <pending-id>
 bin/veto eval --config app/veto.yaml --case app/cases
 ```
 
-`veto approve` prints a different id from the pending one. That id runs once.
+`veto preview` says the delete is waiting. A held invoke returns a pending id. `bin/veto approve` that id prints a second id. The invoke uses the second id, and the delete runs once.
 
 ## MCP
 
@@ -80,7 +79,7 @@ Harbor's APIs stay listening, and the command prints the config to paste. The pa
 
 ## Agent
 
-The agent is Claude, Cursor, or ChatGPT. `make mcp` prints the config to paste. Paste `app/prompts/claude.md` with it. The model reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
+The agent is Claude, Cursor, or ChatGPT. `make mcp` prints the config to paste. Paste `app/prompts/claude.md` with it. The model reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. It shows you the pending id. `veto approve` that id prints a second id. Hand the model the second id. The delete runs once.
 
 ## What `make demo` prints
 
