@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -88,35 +89,44 @@ func waitReady() error {
 
 func banner() string {
 	repo := repoRoot()
-	veto := filepath.Join(repo, "bin", "veto")
-	cfg := filepath.Join(repo, "app", "veto.yaml")
-	approvals := filepath.Join(repo, ".demo", "approvals")
-	tokens := filepath.Join(repo, ".demo", "tokens")
-	return fmt.Sprintf(`Harbor's APIs are listening. Veto is in front of them.
+	body, err := json.MarshalIndent(mcpConfig{
+		MCPServers: map[string]mcpServer{
+			"veto": {
+				Command: filepath.Join(repo, "bin", "veto"),
+				Args:    []string{"serve", "--config", filepath.Join(repo, "app", "veto.yaml"), "--stdio"},
+				Env: map[string]string{
+					"DEMO_TOKEN":              desks.Token,
+					"VETO_APPROVAL_NONCE_DIR": filepath.Join(repo, ".demo", "approvals"),
+					"VETO_TOKEN_DIR":          filepath.Join(repo, ".demo", "tokens"),
+				},
+			},
+		},
+	}, "", "  ")
+	if err != nil {
+		return err.Error() + "\n"
+	}
+	return fmt.Sprintf(`Harbor's APIs are listening.
 
   orders     http://%s
   customers  http://%s
   invoices   http://%s
 
-Order 10482 is Mara Ellison's wool coat. customerId is cus_mara. invoiceId is inv_2291.
-warehouseId is wh_sfo_1 and stays on the order.
+Paste this into Claude, Cursor, or ChatGPT. Paste app/prompts/claude.md as the instruction.
 
-Claude, Cursor, and ChatGPT use the same server:
-
-  %s serve --config %s --stdio
-
-Env for that process:
-
-  DEMO_TOKEN=%s
-  VETO_APPROVAL_NONCE_DIR=%s
-  VETO_TOKEN_DIR=%s
-
-Paste app/prompts/claude.md as the instruction.
-Relationships: app/relations.yaml. Semantics: app/semantics.yaml.
-Another terminal: make show. The CLI: make cli.
-
-`, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, veto, cfg, desks.Token, approvals, tokens)
+%s
+`, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, body)
 }
+
+type (
+	mcpConfig struct {
+		MCPServers map[string]mcpServer `json:"mcpServers"`
+	}
+	mcpServer struct {
+		Command string            `json:"command"`
+		Args    []string          `json:"args"`
+		Env     map[string]string `json:"env"`
+	}
+)
 
 func repoRoot() string {
 	dir, err := os.Getwd()

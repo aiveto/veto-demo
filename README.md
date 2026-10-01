@@ -76,33 +76,11 @@ Claude, Cursor, and ChatGPT use the same server.
 make mcp
 ```
 
-Paste `app/prompts/claude.md` as the instruction. The model gets three tools: `capabilities_search`, `capabilities_describe`, `capabilities_invoke`.
-
-```json
-{
-  "mcpServers": {
-    "veto": {
-      "command": "bin/veto",
-      "args": ["serve", "--config", "app/veto.yaml", "--stdio"],
-      "env": {
-        "DEMO_TOKEN": "demo-token"
-      }
-    }
-  }
-}
-```
-
-Use the absolute paths `make mcp` prints. Set `VETO_APPROVAL_NONCE_DIR` and `VETO_TOKEN_DIR` to the `.demo` directories it prints, so `veto approve` and the MCP process share the yes. Those directories belong to this demo.
+Harbor's APIs stay listening, and the command prints the config to paste. The paths and env in that config are for this directory, including the approval directory `veto approve` shares with the server. Paste `app/prompts/claude.md` as the instruction. The model gets `capabilities_search`, `capabilities_describe`, and `capabilities_invoke`.
 
 ## Agent
 
-The agent is Claude, Cursor, or ChatGPT.
-
-```bash
-make mcp
-```
-
-Paste `app/prompts/claude.md`. The model reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
+The agent is Claude, Cursor, or ChatGPT. `make mcp` prints the config to paste. Paste `app/prompts/claude.md` with it. The model reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
 
 ## What `make demo` prints
 

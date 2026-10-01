@@ -29,7 +29,7 @@ cli: build ## Run the veto CLI on Harbor's contracts
 
 mcp: build ## Leave Harbor's APIs listening for Claude, Cursor, or ChatGPT
 	@mkdir -p "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)"
-	./bin/desks
+	@./bin/desks
 
 up: mcp ## Same as make mcp
 
@@ -38,9 +38,9 @@ show: build ## Play the story again while Harbor's APIs are already up
 
 build: ## Build bin/veto from the module in go.mod, then Harbor's APIs and the walk
 	@mkdir -p bin "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)"
-	go build -o bin/veto github.com/aiveto/veto/cmd/veto
-	go build -o bin/desks ./app/cmd/desks
-	go build -o bin/show ./walk
+	@go build -o bin/veto github.com/aiveto/veto/cmd/veto
+	@go build -o bin/desks ./app/cmd/desks
+	@go build -o bin/show ./walk
 
 vet: ## Fail on gofmt drift or go vet findings
 	@out=$$(gofmt -l .); if [ -n "$$out" ]; then printf '%s\n' "$$out"; exit 1; fi
