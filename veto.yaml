@@ -1,0 +1,9 @@
+semantics: file
+semantics_file: semantics.yaml
+relations_file: relations.yaml
+contracts:
+  - contracts/orders.yaml
+  - contracts/customers.yaml
+  - contracts/invoices.yaml
+auth:
+  bearerAuth: HARBOR_TOKEN

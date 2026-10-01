@@ -1,0 +1,397 @@
+openapi: 3.0.3
+info:
+  title: Harbor Orders
+  version: 2026.09.0
+  description: |
+    Order desk for Harbor, a home-goods merchant. Amounts are integer cents.
+    Deleting an order is permanent. Cancelling one leaves the invoice in place.
+servers:
+  - url: http://127.0.0.1:18410
+    description: Local Harbor orders
+security:
+  - bearerAuth: []
+tags:
+  - name: orders
+    description: Placed orders
+  - name: shipments
+    description: Parcels for an order
+paths:
+  /orders:
+    get:
+      operationId: orders.list
+      tags: [orders]
+      summary: List orders on the desk
+      description: Returns a page of orders. Filter by status when the desk is looking at one queue.
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - name: status
+          in: query
+          description: fulfilled, cancelled, or placed.
+          schema:
+            type: string
+            enum: [placed, fulfilled, cancelled]
+      responses:
+        "200":
+          description: One page of orders.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderPage"
+          links:
+            order:
+              operationId: orders.get
+    post:
+      operationId: orders.create
+      tags: [orders]
+      summary: Place an order
+      description: Creates an order for an existing customer. The invoice is issued by the billing desk.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCreate"
+      responses:
+        "201":
+          description: The order that was placed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          $ref: "#/components/responses/Problem"
+  /orders/{id}:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: orders.get
+      tags: [orders]
+      summary: Read one order
+      description: Returns the order, who placed it, and which invoice covers it.
+      responses:
+        "200":
+          description: The order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          $ref: "#/components/responses/Problem"
+    patch:
+      operationId: orders.update
+      tags: [orders]
+      summary: Change the ship-to address
+      description: Replaces the ship-to address before the parcel leaves the warehouse.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "200":
+          description: The updated order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          $ref: "#/components/responses/Problem"
+    delete:
+      operationId: orders.delete
+      tags: [orders]
+      summary: Delete an order from the desk
+      description: Retire a fulfilled order. The customer and the invoice stay. This cannot be undone.
+      responses:
+        "204":
+          description: The order was deleted.
+        "404":
+          $ref: "#/components/responses/Problem"
+  /orders/{id}/cancel:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    post:
+      operationId: orders.cancel
+      tags: [orders]
+      summary: Cancel an order that has not shipped
+      description: Marks the order cancelled. The customer record and any invoice remain.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+                  description: Why the desk cancelled the order.
+      responses:
+        "200":
+          description: The cancelled order.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "404":
+          $ref: "#/components/responses/Problem"
+  /orders/{id}/notes:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    post:
+      operationId: orders.notes.create
+      tags: [orders]
+      summary: Add a note on an order
+      description: A short note from the person at the desk. It does not change the order status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        "201":
+          description: The note that was stored.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "404":
+          $ref: "#/components/responses/Problem"
+  /orders/{id}/events:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: orders.events.list
+      tags: [orders]
+      summary: List the timeline of an order
+      description: Placement, fulfillment, and cancellation events in order.
+      responses:
+        "200":
+          description: Timeline events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+        "404":
+          $ref: "#/components/responses/Problem"
+  /orders/{id}/shipments:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: shipments.list
+      tags: [shipments]
+      summary: List parcels for an order
+      description: Tracking numbers already handed to the carrier.
+      responses:
+        "200":
+          description: Parcels.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Shipment"
+        "404":
+          $ref: "#/components/responses/Problem"
+    post:
+      operationId: shipments.create
+      tags: [shipments]
+      summary: Record a parcel
+      description: Attaches a carrier tracking number after the warehouse ships.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Shipment"
+      responses:
+        "201":
+          description: The parcel that was recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shipment"
+        "404":
+          $ref: "#/components/responses/Problem"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Desk token. The Harbor mock expects the value in HARBOR_TOKEN.
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Order id, such as 10482.
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: Page size. The desk defaults to 20.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+  responses:
+    Problem:
+      description: The call was rejected.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    Address:
+      type: object
+      required: [name, line1, city, region, postalCode, country]
+      properties:
+        name:
+          type: string
+        line1:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+    Line:
+      type: object
+      required: [sku, name, quantity, unitAmount]
+      properties:
+        sku:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        unitAmount:
+          type: integer
+          description: Price of one unit, in cents.
+    Order:
+      type: object
+      required: [id, status, currency, customerId, invoiceId, warehouseId, placedAt, totalAmount, lines, shipTo]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        currency:
+          type: string
+        customerId:
+          type: string
+          description: Customer on the customers desk.
+        invoiceId:
+          type: string
+          description: Invoice on the billing desk.
+        warehouseId:
+          type: string
+          description: Warehouse code. Harbor does not join this field.
+        placedAt:
+          type: string
+          format: date-time
+        totalAmount:
+          type: integer
+          description: Order total in cents.
+        email:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/Line"
+        shipTo:
+          $ref: "#/components/schemas/Address"
+    OrderPage:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderSummary"
+        nextCursor:
+          type: string
+          nullable: true
+    OrderSummary:
+      type: object
+      required: [id, status, customerId, totalAmount]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+        customerId:
+          type: string
+        totalAmount:
+          type: integer
+    OrderCreate:
+      type: object
+      required: [customerId, lines]
+      properties:
+        customerId:
+          type: string
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/Line"
+    Note:
+      type: object
+      required: [id, body, at]
+      properties:
+        id:
+          type: string
+        body:
+          type: string
+        at:
+          type: string
+          format: date-time
+    Event:
+      type: object
+      required: [at, kind]
+      properties:
+        at:
+          type: string
+          format: date-time
+        kind:
+          type: string
+    Shipment:
+      type: object
+      required: [carrier, tracking]
+      properties:
+        carrier:
+          type: string
+        tracking:
+          type: string
+        shippedAt:
+          type: string
+          format: date-time

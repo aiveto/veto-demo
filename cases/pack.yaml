@@ -1,0 +1,5 @@
+name: pack-omits-the-spec
+input: who placed order 10482
+expect:
+  pack_excludes:
+    - "openapi:"

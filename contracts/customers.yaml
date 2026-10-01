@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: Harbor Customers
+  version: 2026.09.0
+  description: |
+    People who buy from Harbor. An order points here with customerId.
+    This desk does not delete a customer.
+servers:
+  - url: http://127.0.0.1:18411
+    description: Local Harbor customers
+security:
+  - bearerAuth: []
+tags:
+  - name: customers
+    description: Buyer records
+paths:
+  /customers:
+    get:
+      operationId: customers.list
+      tags: [customers]
+      summary: List customers
+      description: Returns buyers, newest first.
+      parameters:
+        - name: limit
+          in: query
+          description: Page size.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: One page of customers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Customer"
+    post:
+      operationId: customers.create
+      tags: [customers]
+      summary: Add a customer
+      description: Opens a buyer record before the first order.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerCreate"
+      responses:
+        "201":
+          description: The customer that was added.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+  /customers/{id}:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: customers.get
+      tags: [customers]
+      summary: Read one customer
+      description: Returns the buyer named by an order's customerId.
+      responses:
+        "200":
+          description: The customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: No customer with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    patch:
+      operationId: customers.update
+      tags: [customers]
+      summary: Change a customer's phone
+      description: Updates the phone number on the buyer record.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+      responses:
+        "200":
+          description: The updated customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          description: No customer with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /customers/{id}/addresses:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: customers.addresses.list
+      tags: [customers]
+      summary: List a customer's addresses
+      description: Saved ship-to addresses, default first.
+      responses:
+        "200":
+          description: Addresses.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Address"
+        "404":
+          description: No customer with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    post:
+      operationId: customers.addresses.create
+      tags: [customers]
+      summary: Save a ship-to address
+      description: Adds an address the next order can use.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "201":
+          description: The address that was saved.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+        "404":
+          description: No customer with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /customers/{id}/notes:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    post:
+      operationId: customers.notes.create
+      tags: [customers]
+      summary: Add a note on a customer
+      description: A short note from the person at the desk.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body:
+                  type: string
+      responses:
+        "201":
+          description: The note that was stored.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, body]
+                properties:
+                  id:
+                    type: string
+                  body:
+                    type: string
+        "404":
+          description: No customer with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Customer id, such as cus_mara.
+      schema:
+        type: string
+  schemas:
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    Address:
+      type: object
+      required: [name, line1, city, region, postalCode, country]
+      properties:
+        name:
+          type: string
+        line1:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+        default:
+          type: boolean
+    Customer:
+      type: object
+      required: [id, name, email, since]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        since:
+          type: string
+          format: date
+        address:
+          $ref: "#/components/schemas/Address"
+    CustomerCreate:
+      type: object
+      required: [name, email]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string

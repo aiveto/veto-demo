@@ -1,0 +1,307 @@
+openapi: 3.0.3
+info:
+  title: Harbor Billing
+  version: 2026.09.0
+  description: |
+    Invoices and payments for Harbor. Amounts are integer cents.
+    Voiding an invoice is a write. It is not a delete.
+servers:
+  - url: http://127.0.0.1:18412
+    description: Local Harbor billing
+security:
+  - bearerAuth: []
+tags:
+  - name: invoices
+    description: Bills for orders
+  - name: payments
+    description: Money collected against an invoice
+paths:
+  /invoices:
+    get:
+      operationId: invoices.list
+      tags: [invoices]
+      summary: List invoices
+      description: Returns bills, newest first.
+      parameters:
+        - name: status
+          in: query
+          description: open, paid, or void.
+          schema:
+            type: string
+            enum: [open, paid, void]
+      responses:
+        "200":
+          description: One page of invoices.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Invoice"
+    post:
+      operationId: invoices.create
+      tags: [invoices]
+      summary: Issue an invoice
+      description: Opens a bill for an order that does not have one yet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderId, customerId, totalAmount]
+              properties:
+                orderId:
+                  type: string
+                customerId:
+                  type: string
+                totalAmount:
+                  type: integer
+                  description: Total in cents.
+      responses:
+        "201":
+          description: The invoice that was issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+  /invoices/{id}:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: invoices.get
+      tags: [invoices]
+      summary: Read one invoice
+      description: Returns the bill named by an order's invoiceId.
+      responses:
+        "200":
+          description: The invoice.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          description: No invoice with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /invoices/{id}/void:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    post:
+      operationId: invoices.void
+      tags: [invoices]
+      summary: Void an open invoice
+      description: Marks an unpaid invoice void. A paid invoice stays paid.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: The voided invoice.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Invoice"
+        "404":
+          description: No invoice with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "409":
+          description: The invoice is already paid.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /invoices/{id}/lines:
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      operationId: invoices.lines.list
+      tags: [invoices]
+      summary: List lines on an invoice
+      description: The SKUs billed on this invoice.
+      responses:
+        "200":
+          description: Invoice lines.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/InvoiceLine"
+        "404":
+          description: No invoice with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /payments:
+    get:
+      operationId: payments.list
+      tags: [payments]
+      summary: List payments
+      description: Money collected, newest first.
+      parameters:
+        - name: invoiceId
+          in: query
+          description: Only payments for this invoice.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+    post:
+      operationId: payments.create
+      tags: [payments]
+      summary: Record a payment
+      description: Applies a card capture to an open invoice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreate"
+      responses:
+        "201":
+          description: The payment that was recorded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+  /payments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Payment id, such as pay_10482.
+        schema:
+          type: string
+    get:
+      operationId: payments.get
+      tags: [payments]
+      summary: Read one payment
+      description: Returns a single capture.
+      responses:
+        "200":
+          description: The payment.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+        "404":
+          description: No payment with that id.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Invoice id, such as inv_2291.
+      schema:
+        type: string
+  schemas:
+    Problem:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    InvoiceLine:
+      type: object
+      required: [sku, name, quantity, amount]
+      properties:
+        sku:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: integer
+        amount:
+          type: integer
+          description: Line amount in cents.
+    Invoice:
+      type: object
+      required: [id, orderId, customerId, status, currency, totalAmount, issuedAt]
+      properties:
+        id:
+          type: string
+        orderId:
+          type: string
+        customerId:
+          type: string
+        status:
+          type: string
+        currency:
+          type: string
+        totalAmount:
+          type: integer
+        issuedAt:
+          type: string
+          format: date-time
+    Payment:
+      type: object
+      required: [id, invoiceId, amount, currency, method]
+      properties:
+        id:
+          type: string
+        invoiceId:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        method:
+          type: string
+        capturedAt:
+          type: string
+          format: date-time
+    PaymentCreate:
+      type: object
+      required: [invoiceId, amount]
+      properties:
+        invoiceId:
+          type: string
+        amount:
+          type: integer
+        method:
+          type: string

@@ -1,0 +1,7 @@
+relations:
+  - schema: Order
+    field: customerId
+    to: customers.get
+  - schema: Order
+    field: invoiceId
+    to: invoices.get
