@@ -10,64 +10,19 @@ That needs Go 1.27.1. The `veto` command comes from `github.com/aiveto/veto` in 
 
 Harbor listens on `127.0.0.1:18410` (orders), `:18411` (customers), and `:18412` (billing). Calls want `Authorization: Bearer demo-token`.
 
-## What `make demo` prints
+## The story
 
-The source of this printout is `walk/`. There is no separate command.
+`make demo` plays it.
 
-```text
-veto
-Harbor's orders, customers, and billing are up. Veto is in front of them.
-The model proposes. Veto decides.
+Harbor has twenty-five operations. The model gets three: search, describe, and invoke.
 
-1  Catalog
-    ok: catalog (25 operations)
-    orders.get --[Order.customerId]--> customers.get
-    orders.get --[Order.invoiceId]--> invoices.get
-    Doctor loaded Harbor's APIs. orders.delete is waiting on a person.
+"Retire order" and "scrap order" both find the delete. Retire is already known. Scrap is a word you added in `app/semantics.yaml`, next to the sentence that this call waits for a person.
 
-2  Three tools
-    capabilities_search, capabilities_describe, capabilities_invoke
-    Harbor publishes more than twenty operations. The agent sees these three.
+Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. Reading it also reads Mara, and her paid invoice, because those links are written in `app/relations.yaml`. The warehouse id on the order is not a link, so nothing calls it.
 
-3  Semantics
-    "retire order"  →  orders.delete
-    "scrap order"  →  orders.delete
-    retire is the built-in synonym. scrap is the overlay. The sentence says the call waits.
+Jonas Adler's linen throw, order 10490, is cancelled, and that call reaches Harbor. Deleting Mara's order does not. Veto stops and asks a person. Approving it gives a new id. That id deletes the order once, and then the order is gone.
 
-4  Context pack
-    The pack for "who placed order 10482" has no raw spec in it.
-
-5  Relations
-    orders.get  →  customers.get   by Order.customerId
-    orders.get  →  invoices.get    by Order.invoiceId
-    10482  Mara Ellison  wool coat and two cedar trays  $556.00  invoice paid
-    warehouse wh_sfo_1 was on the order. Nothing called it.
-
-6  Cancel reaches the desk
-    orders.cancel 10490 went to the desk. No approval. Jonas Adler's linen throw is cancelled.
-
-7  Replay stops
-    "Delete order 10482" selected orders.delete.
-    The trace says confirmation_required. The desk saw no DELETE.
-
-8  MCP stops the same way
-    capabilities_invoke orders.delete  →  confirmation_required
-    pending <pending-id>
-
-9  A person says yes
-    veto approve  →  <second-id>
-    One DELETE /orders/10482. The same id does not run again. The order is gone.
-
-10 Eval
-    veto eval  delete still requires confirmation, and the pack still omits the spec.
-
-Mara's order was read, then her customer, then her invoice.
-The warehouse id stayed a field.
-Cancel reached the desk. Delete did not, until a person approved it.
-The approved id ran once.
-```
-
-The two ids change every run. The pending id is the handle. The second id is the one that deletes the order, once.
+The model never receives the OpenAPI file.
 
 ## Your turn
 
