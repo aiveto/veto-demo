@@ -1,6 +1,6 @@
 # Harbor's APIs
 
-Orders, customers, and billing, already hosted. Veto is `bin/veto` one directory up, built from the module in `go.mod`.
+The three APIs that run Harbor's online business: orders, customers, and billing. Veto is `bin/veto` one directory up, built from the module in `go.mod`.
 
 | You want | File |
 | --- | --- |
