@@ -1,4 +1,5 @@
+# Words for the model. scrap is an extra name for orders.delete. retire is already built in.
 - operation: orders.delete
-  sentence: Retire a fulfilled order. The customer and the invoice stay. This call waits for a person.
+  sentence: Retire a fulfilled Harbor order. The customer and the invoice stay. This call waits for a person.
   synonyms:
     - scrap

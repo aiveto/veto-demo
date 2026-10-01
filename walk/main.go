@@ -66,7 +66,7 @@ func run() error {
 		return err
 	}
 
-	fmt.Print("veto\nThree desks. One catalog. The model proposes. Veto decides.\n")
+	fmt.Print("veto\nHarbor's orders, customers, and billing are up. Veto is in front of them.\nThe model proposes. Veto decides.\n")
 
 	if err := s.catalog(); err != nil {
 		return err
@@ -131,7 +131,7 @@ func (s *show) catalog() error {
 	if !strings.Contains(doc, "orders.delete") {
 		return fmt.Errorf("doctor did not name orders.delete\n%s", doc)
 	}
-	fmt.Print("    Doctor loaded the desks. orders.delete is waiting on a person.\n")
+	fmt.Print("    Doctor loaded Harbor's APIs. orders.delete is waiting on a person.\n")
 	return nil
 }
 
@@ -150,7 +150,7 @@ func (s *show) tools(session *mcp.ClientSession) error {
 		return fmt.Errorf("mcp tools are %s", got)
 	}
 	fmt.Printf("    %s\n", got)
-	fmt.Print("    The desks publish more than twenty operations. The agent sees these three.\n")
+	fmt.Print("    Harbor publishes more than twenty operations. The agent sees these three.\n")
 	return nil
 }
 

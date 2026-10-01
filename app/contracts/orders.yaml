@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
-  title: Orders
+  title: Harbor orders
   version: 2026.09.0
   description: |
-    Order desk for a home-goods merchant. Amounts are integer cents.
+    Harbor's order API. Amounts are integer cents.
     Deleting an order is permanent. Cancelling one leaves the invoice in place.
 servers:
   - url: http://127.0.0.1:18410
-    description: Local orders
+    description: Harbor orders
 security:
   - bearerAuth: []
 tags:

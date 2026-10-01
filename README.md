@@ -1,58 +1,83 @@
 # veto demo
 
-Two checkouts. Veto is the one you pull. `app/` is a sample of the one you write.
+Harbor sells home goods. Three APIs are already hosted under `app/`: orders, customers, and billing. Veto sits in front of them. This is what veto does with APIs you already have.
 
 ```bash
 make demo
 ```
 
-That needs a checkout of [veto](https://github.com/aiveto/veto) next to this directory, and Go 1.27.1.
+That needs a checkout of [veto](https://github.com/aiveto/veto) next to this directory, and Go 1.27.1. `make` builds `bin/veto` from that checkout.
 
-## What you pull
+## Where to go
 
-Veto. The command. `make` builds it from `../veto` and writes `bin/veto`. You do not copy veto's source into your application.
+| You want | Open | Run |
+| --- | --- | --- |
+| The whole story | | `make demo` |
+| The CLI | | `make cli` |
+| Claude, Cursor, or ChatGPT | `app/prompts/claude.md` | `make mcp` |
+| The agent, with no live model | | `make cli` |
+| A relationship between APIs | `app/relations.yaml` | `make demo` |
+| Semantics, the words for a call | `app/semantics.yaml` | `make demo` |
+| Which contracts veto loads | `app/veto.yaml` | |
+| Harbor's API contracts | `app/contracts/` | |
+| The process hosting those APIs | `app/desks/` | `make mcp` |
 
-## What you write
+`walk/` is the program `make demo` runs. It plays the story and prints each step. Your own APIs stay where they already run. You point `veto.yaml` at your OpenAPI.
 
-`app/` is that application, filled in with a home-goods merchant so the walk has something real to call.
+## Harbor's APIs
 
-| Path | Yours |
-| --- | --- |
-| `app/contracts` | OpenAPI. Orders, customers, and billing. Twenty-five operations. |
-| `app/desks`, `app/cmd/desks` | The services those contracts describe. Here they are in memory, and they stay listening. |
-| `app/veto.yaml` | Points veto at the contracts, and names the env var that holds the token. |
-| `app/semantics.yaml` | Your words. One sentence on the delete, and the synonym scrap. |
-| `app/relations.yaml` | Which fields are the next call. `customerId` and `invoiceId`. Not `warehouseId`. |
-| `app/prompts/claude.md` | The instruction you give the model. |
-| `app/cases` | Checks you run with `veto eval`. |
+Imagine these are already in production. `app/desks` hosts them for the demo.
 
-## What this repository adds so you can watch
+| API | Address | What is there |
+| --- | --- | --- |
+| Orders | `127.0.0.1:18410` | Order 10482, Mara Ellison, a wool coat and two cedar trays, $556.00 |
+| Customers | `127.0.0.1:18411` | Mara, `cus_mara` |
+| Billing | `127.0.0.1:18412` | Invoice `inv_2291`, paid |
 
-`walk/` drives `bin/veto` against `app/`. `make demo` starts the services, runs the walk, and stops them. You do not copy `walk/` into an application.
+`warehouseId` is `wh_sfo_1`. It sits on the order.
 
-## What you see
+Calls want `Authorization: Bearer demo-token`.
 
-Mara Ellison's order is 10482: a wool coat and two cedar trays, $556.00. The customer is Mara. The invoice is paid. A warehouse id sits on the order.
+## Relationships
 
-The walk prints each of these.
+`app/relations.yaml`.
 
-**One catalog, three tools.** Twenty-five operations across the three contracts. The model gets `capabilities_search`, `capabilities_describe`, and `capabilities_invoke`. It does not get one tool per operation.
+`customerId` on an order is the next call, `customers.get`. `invoiceId` is `invoices.get`. Add a line there to add a join. `warehouseId` has no line, so it stays a field.
 
-**Search knows the words.** "Retire order" and "scrap order" both name `orders.delete`. Retire is a built-in synonym. Scrap is one line in `app/semantics.yaml`, next to the sentence that this call waits for a person.
+## Semantics
 
-**A field is not a join.** Reading the order names the next call for `customerId` and for `invoiceId`. `warehouseId` stays a field. The joins are in `app/relations.yaml`.
+`app/semantics.yaml`.
 
-**A write is not a delete.** Cancelling Jonas Adler's order reaches the service. Deleting Mara's order does not. Preview, the scripted agent, and invoke all stop before HTTP. `veto approve` prints a different id. That id runs once. A second use is refused. The order is then gone.
+One sentence on `orders.delete`: this call waits for a person. One extra word, `scrap`. "Retire" is already built in. Search for either word and veto names `orders.delete`.
 
-**The model does not receive the raw spec.** The context pack holds the rules, a one-line index, and the operation just described. `veto eval` checks that stop, and that the pack does not contain the contract.
-
-## Leave the services up
+## CLI
 
 ```bash
-make up
+make cli
 ```
 
-That prints the `veto serve` command for Claude or ChatGPT. Paste `app/prompts/claude.md` as the instruction. In another terminal, `make show` runs the same walk.
+Veto loads Harbor's contracts, prints the catalog and the joins, then the scripted agent hears "Delete order 10482". It selects `orders.delete` and stops before HTTP.
+
+With the APIs up in another terminal (`make mcp`):
+
+```bash
+bin/veto validate --config app/veto.yaml
+bin/veto preview --config app/veto.yaml --operation orders.delete --param id=10482
+bin/veto approve <pending-id>
+bin/veto eval --config app/veto.yaml --case app/cases
+```
+
+`veto approve` prints a different id from the pending one. That id runs once.
+
+## MCP
+
+Claude, Cursor, and ChatGPT use the same server.
+
+```bash
+make mcp
+```
+
+Paste `app/prompts/claude.md` as the instruction. The model gets three tools: `capabilities_search`, `capabilities_describe`, `capabilities_invoke`.
 
 ```json
 {
@@ -68,10 +93,14 @@ That prints the `veto serve` command for Claude or ChatGPT. Paste `app/prompts/c
 }
 ```
 
-Use the absolute paths `make up` prints. Set `VETO_APPROVAL_NONCE_DIR` and `VETO_TOKEN_DIR` to the `.demo` directories it prints, so `veto approve` and the MCP process share the yes. Those directories are this demo's approvals, not yours.
+Use the absolute paths `make mcp` prints. Set `VETO_APPROVAL_NONCE_DIR` and `VETO_TOKEN_DIR` to the `.demo` directories it prints, so `veto approve` and the MCP process share the yes. Those directories belong to this demo.
 
-The services listen on `127.0.0.1:18410`, `:18411`, and `:18412`. API calls want `Authorization: Bearer demo-token`.
+## Agent
 
-## Commands
+`make cli` is the agent with no API key. The scripted model asks to delete order 10482. Veto's policy stops the call. `app/cases` locks that same stop for `veto eval`.
 
-`make` is `make demo`. `make help` lists the targets. `make vet` checks gofmt and `go vet`.
+A live agent is Claude, Cursor, or ChatGPT on `make mcp`, with `app/prompts/claude.md`. It reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
+
+## What `make demo` prints
+
+Mara's order, then her customer, then her invoice. The warehouse id stays a field. Jonas Adler's cancel reaches the orders API. Mara's delete waits until a person approves it, runs once, and the order is gone. The context pack holds the rules and the operation just described. The raw contract stays out of the model.

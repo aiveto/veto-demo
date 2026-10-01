@@ -1,3 +1,5 @@
+# Joins between Harbor's APIs. A field listed here is the next call.
+# warehouseId is not listed, so it stays a field on the order.
 relations:
   - schema: Order
     field: customerId

@@ -92,17 +92,16 @@ func banner() string {
 	cfg := filepath.Join(repo, "app", "veto.yaml")
 	approvals := filepath.Join(repo, ".demo", "approvals")
 	tokens := filepath.Join(repo, ".demo", "tokens")
-	return fmt.Sprintf(`Your services are listening. Veto is %s.
+	return fmt.Sprintf(`Harbor's APIs are listening. Veto is in front of them.
 
   orders     http://%s
   customers  http://%s
   invoices   http://%s
 
 Order 10482 is Mara Ellison's wool coat. customerId is cus_mara. invoiceId is inv_2291.
-warehouseId is wh_sfo_1 and is not a join.
+warehouseId is wh_sfo_1 and stays on the order.
 
-Your config is %s.
-Claude or ChatGPT, same three tools:
+Claude, Cursor, and ChatGPT use the same server:
 
   %s serve --config %s --stdio
 
@@ -112,10 +111,11 @@ Env for that process:
   VETO_APPROVAL_NONCE_DIR=%s
   VETO_TOKEN_DIR=%s
 
-The instruction to paste is app/prompts/claude.md.
-Another terminal: make show.
+Paste app/prompts/claude.md as the instruction.
+Relationships: app/relations.yaml. Semantics: app/semantics.yaml.
+Another terminal: make show. The scripted agent: make cli.
 
-`, veto, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, cfg, veto, cfg, desks.Token, approvals, tokens)
+`, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, veto, cfg, desks.Token, approvals, tokens)
 }
 
 func repoRoot() string {

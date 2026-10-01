@@ -8,12 +8,12 @@ export VETO_APPROVAL_NONCE_DIR := $(ROOT)/.demo/approvals
 export VETO_TOKEN_DIR := $(ROOT)/.demo/tokens
 unexport VETO_APPROVAL_SECRET
 
-.PHONY: help demo up show build vet
+.PHONY: help demo cli mcp up show build vet
 
 help: ## Print each target with a one-line description
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "%-8s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-demo: build ## Start the desks, run the walk, stop the desks
+demo: build ## Play the whole story against Harbor's APIs
 	@mkdir -p "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)" .demo
 	@./bin/desks > .demo/desks.log 2>&1 & echo $$! > .demo/desks.pid; \
 	./bin/show; \
@@ -23,11 +23,17 @@ demo: build ## Start the desks, run the walk, stop the desks
 	if [ $$status -ne 0 ]; then echo "--- desk log ---"; cat .demo/desks.log; fi; \
 	exit $$status
 
-up: build ## Leave the three desks listening and print the MCP command
+cli: build ## Run the veto CLI and the scripted agent on Harbor's contracts
+	./bin/veto validate --config app/veto.yaml
+	./bin/veto replay --config app/veto.yaml --message "Delete order 10482"
+
+mcp: build ## Leave Harbor's APIs listening for Claude, Cursor, or ChatGPT
 	@mkdir -p "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)"
 	./bin/desks
 
-show: build ## Run the walk against desks that are already up
+up: mcp ## Same as make mcp
+
+show: build ## Play the story again while Harbor's APIs are already up
 	./bin/show
 
 build: ## Build veto from the sibling checkout, then the sample services and the walk
