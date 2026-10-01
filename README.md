@@ -6,7 +6,7 @@ Harbor sells home goods. Three APIs are already hosted under `app/`: orders, cus
 make demo
 ```
 
-That needs a checkout of [veto](https://github.com/aiveto/veto) next to this directory, and Go 1.27.1. `make` builds `bin/veto` from that checkout.
+That needs Go 1.27.1. Veto is already in `go.mod` as `github.com/aiveto/veto`. `make` builds `bin/veto` from that module. The module is private, so `make` sets `GOPRIVATE` and Go fetches it with your GitHub credentials.
 
 ## Where to go
 
@@ -22,7 +22,7 @@ That needs a checkout of [veto](https://github.com/aiveto/veto) next to this dir
 | Harbor's API contracts | `app/contracts/` | |
 | The process hosting those APIs | `app/desks/` | `make mcp` |
 
-`walk/` is the program `make demo` runs. It plays the story and prints each step. Your own APIs stay where they already run. You point `veto.yaml` at your OpenAPI.
+`walk/` is the program `make demo` runs. It plays the story and prints each step. Your own APIs stay where they already run. You point `veto.yaml` at your OpenAPI, and you depend on `github.com/aiveto/veto` the same way this `go.mod` does.
 
 ## Harbor's APIs
 

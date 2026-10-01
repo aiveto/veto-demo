@@ -1,8 +1,8 @@
 .DEFAULT_GOAL := demo
 
 ROOT := $(abspath .)
-VETO_SRC := $(abspath $(ROOT)/../veto)
 
+export GOPRIVATE := github.com/aiveto/veto
 export DEMO_TOKEN := demo-token
 export VETO_APPROVAL_NONCE_DIR := $(ROOT)/.demo/approvals
 export VETO_TOKEN_DIR := $(ROOT)/.demo/tokens
@@ -36,10 +36,9 @@ up: mcp ## Same as make mcp
 show: build ## Play the story again while Harbor's APIs are already up
 	./bin/show
 
-build: ## Build veto from the sibling checkout, then the sample services and the walk
-	@test -d "$(VETO_SRC)/cmd/veto" || (echo "need a veto checkout at $(VETO_SRC)"; exit 1)
+build: ## Build bin/veto from the module in go.mod, then Harbor's APIs and the walk
 	@mkdir -p bin "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)"
-	go build -C "$(VETO_SRC)" -o "$(ROOT)/bin/veto" ./cmd/veto
+	go build -o bin/veto github.com/aiveto/veto/cmd/veto
 	go build -o bin/desks ./app/cmd/desks
 	go build -o bin/show ./walk
 

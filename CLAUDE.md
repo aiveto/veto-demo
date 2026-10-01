@@ -2,7 +2,7 @@
 
 Veto is the product. Harbor is the sample merchant.
 
-Veto is the sibling checkout `../veto`. `make` builds that checkout to `bin/veto`. Do not copy veto's source into `app/`.
+Veto is the module `github.com/aiveto/veto`, a tool in `go.mod`. `make` builds `bin/veto` from that module. Do not add a sibling checkout, a replace directive, or a copy of veto's source into `app/`.
 
 `app/` is Harbor's three APIs, already hosted for the demo, plus the files a person edits: `relations.yaml`, `semantics.yaml`, `veto.yaml`, `prompts/claude.md`, and `cases/`. `walk/` is the program `make demo` runs. A user's own APIs stay in their own repo.
 

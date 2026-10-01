@@ -1,6 +1,6 @@
 # Harbor's APIs
 
-Imagine these three are already hosted. Veto is the `bin/veto` binary one directory up. It sits in front of them.
+Imagine these three are already hosted. Veto is the `bin/veto` binary one directory up, built from the module in `go.mod`. It sits in front of them.
 
 | You want | File |
 | --- | --- |
