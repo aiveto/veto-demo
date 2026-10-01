@@ -23,7 +23,7 @@ demo: build ## Play the whole story against Harbor's APIs
 	if [ $$status -ne 0 ]; then echo "--- desk log ---"; cat .demo/desks.log; fi; \
 	exit $$status
 
-cli: build ## Run the veto CLI and the scripted agent on Harbor's contracts
+cli: build ## Run the veto CLI on Harbor's contracts
 	./bin/veto validate --config app/veto.yaml
 	./bin/veto replay --config app/veto.yaml --message "Delete order 10482"
 

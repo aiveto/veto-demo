@@ -6,7 +6,7 @@ Veto is the module `github.com/aiveto/veto`, a tool in `go.mod`. `make` builds `
 
 `app/` is Harbor's three APIs, already hosted for the demo, plus the files a person edits: `relations.yaml`, `semantics.yaml`, `veto.yaml`, `prompts/claude.md`, and `cases/`. `walk/` is the program `make demo` runs. A user's own APIs stay in their own repo.
 
-`make demo` plays the story. `make cli` runs the CLI and the scripted agent. `make mcp` leaves Harbor's APIs listening for Claude, Cursor, or ChatGPT.
+`make demo` plays the story. `make cli` runs the veto CLI. `make mcp` leaves Harbor's APIs listening for Claude, Cursor, or ChatGPT. Those three are the agent.
 
 Approvals and tokens stay under `.demo/`. Do not point them at a real veto approval directory. Leave `VETO_APPROVAL_SECRET` unset.
 

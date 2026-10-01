@@ -12,4 +12,4 @@ Imagine these three are already hosted. Veto is the `bin/veto` binary one direct
 | Tell Claude, Cursor, or ChatGPT what to do | `prompts/claude.md` |
 | The checks the CLI runs | `cases/` |
 
-From the repo root: `make demo` plays the story, `make cli` runs the veto CLI and the scripted agent, `make mcp` leaves these APIs listening.
+From the repo root: `make demo` plays the story, `make cli` runs the veto CLI, `make mcp` leaves these APIs listening for Claude, Cursor, or ChatGPT.

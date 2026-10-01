@@ -113,7 +113,7 @@ Env for that process:
 
 Paste app/prompts/claude.md as the instruction.
 Relationships: app/relations.yaml. Semantics: app/semantics.yaml.
-Another terminal: make show. The scripted agent: make cli.
+Another terminal: make show. The CLI: make cli.
 
 `, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, veto, cfg, desks.Token, approvals, tokens)
 }

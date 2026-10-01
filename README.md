@@ -15,7 +15,6 @@ That needs Go 1.27.1. Veto is already in `go.mod` as `github.com/aiveto/veto`. `
 | The whole story | | `make demo` |
 | The CLI | | `make cli` |
 | Claude, Cursor, or ChatGPT | `app/prompts/claude.md` | `make mcp` |
-| The agent, with no live model | | `make cli` |
 | A relationship between APIs | `app/relations.yaml` | `make demo` |
 | Semantics, the words for a call | `app/semantics.yaml` | `make demo` |
 | Which contracts veto loads | `app/veto.yaml` | |
@@ -56,7 +55,7 @@ One sentence on `orders.delete`: this call waits for a person. One extra word, `
 make cli
 ```
 
-Veto loads Harbor's contracts, prints the catalog and the joins, then the scripted agent hears "Delete order 10482". It selects `orders.delete` and stops before HTTP.
+Veto loads Harbor's contracts and prints the catalog and the joins. Then `veto replay` matches the sentence "Delete order 10482", selects `orders.delete`, and stops before HTTP.
 
 With the APIs up in another terminal (`make mcp`):
 
@@ -97,9 +96,13 @@ Use the absolute paths `make mcp` prints. Set `VETO_APPROVAL_NONCE_DIR` and `VET
 
 ## Agent
 
-`make cli` is the agent with no API key. The scripted model asks to delete order 10482. Veto's policy stops the call. `app/cases` locks that same stop for `veto eval`.
+The agent is Claude, Cursor, or ChatGPT.
 
-A live agent is Claude, Cursor, or ChatGPT on `make mcp`, with `app/prompts/claude.md`. It reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
+```bash
+make mcp
+```
+
+Paste `app/prompts/claude.md`. The model reads Mara's order, follows the customer and the invoice, lets a cancel through, and stops when the delete asks for a person. You run `veto approve` and hand it the new id.
 
 ## What `make demo` prints
 

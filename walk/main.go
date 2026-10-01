@@ -277,7 +277,7 @@ func (s *show) allowedWrite(session *mcp.ClientSession) error {
 }
 
 func (s *show) agentStops() error {
-	fmt.Print("\n7  The agent stops\n")
+	fmt.Print("\n7  Replay stops\n")
 	before := mustLog()
 	out, errText, err := s.command("preview", "--config", s.config(), "--operation", "orders.delete", "--param", "id=10482")
 	if err != nil {
