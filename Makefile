@@ -35,9 +35,13 @@ up: mcp ## Same as make mcp
 show: build ## Play the story again while Harbor's APIs are already up
 	./bin/show
 
-build: ## Build bin/veto from the module in go.mod, then Harbor's APIs and the walk
+build: ## Build bin/veto (sibling ../veto if present, else the module in go.mod), then Harbor's APIs and the walk
 	@mkdir -p bin "$(VETO_APPROVAL_NONCE_DIR)" "$(VETO_TOKEN_DIR)"
-	@go build -o bin/veto github.com/aiveto/veto/cmd/veto
+	@if [ -f "$(ROOT)/../veto/go.mod" ]; then \
+		go build -C "$(ROOT)/../veto" -o "$(ROOT)/bin/veto" ./cmd/veto; \
+	else \
+		go build -o bin/veto github.com/aiveto/veto/cmd/veto; \
+	fi
 	@go build -o bin/desks ./app/cmd/desks
 	@go build -o bin/show ./walk
 
