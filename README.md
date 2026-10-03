@@ -1,4 +1,4 @@
-<img src="docs/veto-social.png" width="1280" alt="veto makes it possible for an AI agent to call your API with context and semantics. 500 endpoints turn into 3 tools.">
+<img src="docs/veto-social.png" width="1280" alt="veto makes it possible for an AI agent to call your API with context and semantics. A hundred endpoints stay 3 tools.">
 
 Imagine Harbor sells home goods. Orders, customers, and billing are the three APIs that run that business. This demo hosts them under `app/`. Veto sits in front of them. Your APIs stay where they already run.
 
