@@ -414,17 +414,15 @@ func firstHit(session *mcp.ClientSession, query string) (string, error) {
 		return "", err
 	}
 	var hits []struct {
-		Operation struct {
-			ID string `json:"ID"`
-		} `json:"Operation"`
+		ID string `json:"id"`
 	}
 	if err := json.Unmarshal([]byte(text), &hits); err != nil {
 		return "", fmt.Errorf("search %q: %w\n%s", query, err, text)
 	}
-	if len(hits) == 0 || hits[0].Operation.ID == "" {
+	if len(hits) == 0 || hits[0].ID == "" {
 		return "", fmt.Errorf("search %q returned nothing\n%s", query, text)
 	}
-	return hits[0].Operation.ID, nil
+	return hits[0].ID, nil
 }
 
 func invoke(session *mcp.ClientSession, operation string, params map[string]any, approval string) (invokeOut, error) {
