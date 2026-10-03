@@ -6,7 +6,7 @@ require github.com/modelcontextprotocol/go-sdk v1.8.0
 
 require (
 	github.com/agnivade/levenshtein v1.2.1 // indirect
-	github.com/aiveto/veto v0.1.0 // indirect
+	github.com/aiveto/veto v0.1.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.1 // indirect
@@ -38,6 +38,7 @@ require (
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.3 // indirect
+	github.com/valkey-io/valkey-go v1.0.78 // indirect
 	github.com/valyala/fastjson v1.6.10 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.37 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect

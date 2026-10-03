@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.1 - 2026-10-03
+
+- Tracks veto v0.1.1. `veto approve --config` is on that binary.
+
 - README and the Claude prompt say `veto approve` shares `VETO_APPROVAL_NONCE_DIR` with `make mcp`. A sibling `../veto` checkout is what `make` builds. CI runs `make demo`.
 
 ## v0.1.0 - 2026-10-02
