@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.4 - 2026-10-03
+
+- Tracks veto v0.1.4.
+
 ## v0.1.3 - 2026-10-03
 
 - Tracks veto v0.1.3. Search returns the pack line, not the operation.
