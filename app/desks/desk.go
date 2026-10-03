@@ -4,6 +4,7 @@ package desks
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -184,6 +185,8 @@ func (d *Desk) ordersRoute(w http.ResponseWriter, r *http.Request) int {
 	path := strings.Trim(r.URL.Path, "/")
 	parts := strings.Split(path, "/")
 	if path == "orders" && r.Method == http.MethodGet {
+		want := r.URL.Query().Get("status")
+		limit := pageSize(r.URL.Query().Get("limit"))
 		d.mu.Lock()
 		defer d.mu.Unlock()
 		var data []map[string]any
@@ -192,7 +195,13 @@ func (d *Desk) ordersRoute(w http.ResponseWriter, r *http.Request) int {
 			if o == nil {
 				continue
 			}
+			if want != "" && o.Status != want {
+				continue
+			}
 			data = append(data, map[string]any{"id": o.ID, "status": o.Status, "customerId": o.CustomerID, "totalAmount": o.TotalAmount})
+			if len(data) == limit {
+				break
+			}
 		}
 		return writeJSON(w, http.StatusOK, map[string]any{"data": data, "nextCursor": nil})
 	}
@@ -398,6 +407,14 @@ func (d *Desk) lookupInvoice(id string) (*Invoice, bool) {
 	defer d.mu.Unlock()
 	inv, ok := d.invoices[id]
 	return inv, ok
+}
+
+func pageSize(raw string) int {
+	n, err := strconv.Atoi(raw)
+	if err != nil || n <= 0 {
+		return 20
+	}
+	return n
 }
 
 func writeJSON(w http.ResponseWriter, status int, body any) int {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `GET /orders` honors `status` and `limit`.
+
 ## v0.1.1 - 2026-10-03
 
 - Tracks veto v0.1.1. `veto approve --config` is on that binary.
