@@ -1,7 +1,8 @@
 # Changelog
 
-## Unreleased
+## v0.1.2 - 2026-10-03
 
+- Tracks veto v0.1.2.
 - `GET /orders` honors `status` and `limit`.
 
 ## v0.1.1 - 2026-10-03
