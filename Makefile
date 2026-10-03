@@ -2,7 +2,6 @@
 
 ROOT := $(abspath .)
 
-export GOPRIVATE := github.com/aiveto/veto
 export DEMO_TOKEN := demo-token
 export VETO_APPROVAL_NONCE_DIR := $(ROOT)/.demo/approvals
 export VETO_TOKEN_DIR := $(ROOT)/.demo/tokens
