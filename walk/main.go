@@ -293,6 +293,9 @@ func (s *show) agentStops() error {
 	if !strings.Contains(trace, "orders.delete") || !strings.Contains(trace, "confirmation_required") {
 		return fmt.Errorf("replay did not stop on confirmation\n%s", trace)
 	}
+	if secret := os.Getenv("DEMO_TOKEN"); secret != "" && (strings.Contains(trace, secret) || strings.Contains(errText, secret)) {
+		return errors.New("replay wrote the demo token")
+	}
 	if mustLog().Deletes != before.Deletes {
 		return errors.New("the scripted agent reached the desk")
 	}
