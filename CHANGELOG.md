@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.5 - 2026-10-03
+
+- Tracks veto v0.1.5.
+
 ## v0.1.4 - 2026-10-03
 
 - Tracks veto v0.1.4.
