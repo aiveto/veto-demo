@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := demo
+.DEFAULT_GOAL := help
 
 ROOT := $(abspath .)
 
