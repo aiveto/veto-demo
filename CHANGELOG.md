@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-- `make` and `make help` print the targets. `make demo` still plays the story.
+## v0.1.6 - 2026-10-04
+
+- Tracks veto v0.1.6. Search hits include `related_calls`. A pending id submitted as `approval_id` is `pending_approval`.
+- `make cli` plays the story through search, describe, and invoke. `make mcp` leaves the APIs up for a host. `make demo` runs both. `app/prompts/skill.md` is the CLI instruction.
 
 ## v0.1.5 - 2026-10-03
 

@@ -23,6 +23,12 @@ func main() {
 }
 
 func run() error {
+	quiet := false
+	for _, a := range os.Args[1:] {
+		if a == "--quiet" {
+			quiet = true
+		}
+	}
 	desk := desks.New()
 	servers := []*http.Server{
 		{Addr: desks.OrdersAddr, Handler: desk.Handler("orders")},
@@ -40,7 +46,9 @@ func run() error {
 	if err := waitReady(); err != nil {
 		return err
 	}
-	fmt.Print(banner())
+	if !quiet {
+		fmt.Print(banner())
+	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
@@ -112,6 +120,8 @@ func banner() string {
   invoices   http://%s
 
 Paste this into Claude, Cursor, or ChatGPT. Paste app/prompts/claude.md as the instruction.
+
+veto serve --json serves JSON lines for skills and scripts. app/prompts/skill.md is that instruction. make cli plays search, describe, and invoke.
 
 %s
 `, desks.OrdersAddr, desks.CustomersAddr, desks.InvoicesAddr, body)
