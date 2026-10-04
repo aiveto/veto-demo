@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `make` and `make help` print the targets. `make demo` still plays the story.
+
 ## v0.1.5 - 2026-10-03
 
 - Tracks veto v0.1.5.

@@ -6,7 +6,7 @@ Imagine Harbor sells home goods. Orders, customers, and billing are the three AP
 make demo
 ```
 
-That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
+`make help` lists the other targets. That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
 
 ## What veto does
 
