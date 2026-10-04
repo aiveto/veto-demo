@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.7 - 2026-10-04
+
+- Tracks veto v0.1.7. Query, path, and header values are checked before HTTP. Preview keeps integer digits. CLI, JSON, and MCP are locked by one surface test.
+
 ## v0.1.6 - 2026-10-04
 
 - Tracks veto v0.1.6. Search hits include `related_calls`. A pending id submitted as `approval_id` is `pending_approval`.
