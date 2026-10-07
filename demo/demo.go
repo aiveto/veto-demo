@@ -38,16 +38,22 @@ type (
 	}
 
 	InvokeOut struct {
-		Status      string `json:"status"`
-		ApprovalID  string `json:"approval_id"`
-		OperationID string `json:"operation_id"`
-		HTTPStatus  int    `json:"http_status"`
-		Body        string `json:"body"`
-		Error       string `json:"error"`
-		Code        string `json:"code"`
-		Why         string `json:"why"`
-		HTTP        bool   `json:"http"`
-		Sent        bool   `json:"sent"`
+		Status      string     `json:"status"`
+		ApprovalID  string     `json:"approval_id"`
+		OperationID string     `json:"operation_id"`
+		HTTPStatus  int        `json:"http_status"`
+		Body        string     `json:"body"`
+		Error       string     `json:"error"`
+		Code        string     `json:"code"`
+		Why         string     `json:"why"`
+		HTTP        bool       `json:"http"`
+		Sent        bool       `json:"sent"`
+		NextCalls   []NextCall `json:"next_calls"`
+	}
+
+	NextCall struct {
+		OperationID string            `json:"operation_id"`
+		Params      map[string]string `json:"params"`
 	}
 
 	hitLog struct {
@@ -203,14 +209,29 @@ func relations(a Adapter) error {
 	if order.Status != "ok" || !strings.Contains(order.Body, "cus_mara") || !strings.Contains(order.Body, "inv_2291") || !strings.Contains(order.Body, "wh_sfo_1") {
 		return fmt.Errorf("orders.get body %s", order.Body)
 	}
-	customer, err := a.Invoke("customers.get", map[string]any{"id": "cus_mara"}, "")
+	customerCall, ok := order.next("customers.get", "id", "cus_mara")
+	if !ok {
+		return fmt.Errorf("orders.get next_calls %v", order.NextCalls)
+	}
+	invoiceCall, ok := order.next("invoices.get", "id", "inv_2291")
+	if !ok {
+		return fmt.Errorf("orders.get next_calls %v", order.NextCalls)
+	}
+	for _, call := range order.NextCalls {
+		for _, value := range call.Params {
+			if value == "wh_sfo_1" {
+				return fmt.Errorf("warehouse id was a next call: %+v", call)
+			}
+		}
+	}
+	customer, err := a.Invoke(customerCall.OperationID, argsOf(customerCall), "")
 	if err != nil {
 		return err
 	}
 	if customer.Status != "ok" || !strings.Contains(customer.Body, "Mara Ellison") {
 		return fmt.Errorf("customers.get %s %s", customer.Status, customer.Body)
 	}
-	invoice, err := a.Invoke("invoices.get", map[string]any{"id": "inv_2291"}, "")
+	invoice, err := a.Invoke(invoiceCall.OperationID, argsOf(invoiceCall), "")
 	if err != nil {
 		return err
 	}
@@ -225,7 +246,7 @@ func relations(a Adapter) error {
 		return fmt.Errorf("the joins did not reach the desks\n%+v", after.Calls)
 	}
 	fmt.Print("    10482  Mara Ellison  wool coat and two cedar trays  $556.00  invoice paid\n")
-	fmt.Print("    warehouse wh_sfo_1 was on the order. Nothing called it.\n")
+	fmt.Print("    next_calls named the customer and the invoice. warehouse wh_sfo_1 was not a call.\n")
 	return nil
 }
 
@@ -383,6 +404,23 @@ func contains(list []string, want string) bool {
 		}
 	}
 	return false
+}
+
+func (out InvokeOut) next(operationID, param, value string) (NextCall, bool) {
+	for _, call := range out.NextCalls {
+		if call.OperationID == operationID && call.Params[param] == value {
+			return call, true
+		}
+	}
+	return NextCall{}, false
+}
+
+func argsOf(call NextCall) map[string]any {
+	params := make(map[string]any, len(call.Params))
+	for name, value := range call.Params {
+		params[name] = value
+	}
+	return params
 }
 
 func decodeInvoke(raw string) (InvokeOut, error) {

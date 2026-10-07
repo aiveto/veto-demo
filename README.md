@@ -18,7 +18,7 @@ You point veto at your OpenAPI. The model gets three tools: search, describe, an
 
 Harbor has twenty-five operations. "Retire order" and "scrap order" both find the delete. Retire is already known. Scrap is an extra word in `app/semantics.yaml`, beside the sentence that this call waits for a person.
 
-Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. Reading it also reads Mara, and her paid invoice, because those links are written in `app/relations.yaml`. Search returns those related ids and `related_calls`. The warehouse id on the order is not a link, so nothing calls it.
+Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. Reading it also reads Mara, and her paid invoice, because those links are written in `app/relations.yaml`. Search returns those related ids and `related_calls`. The invoke result names the same calls in `next_calls`, with the ids from the order. The warehouse id on the order is not a link, so nothing calls it.
 
 Jonas Adler asks to cancel his linen throw, order 10490. That call reaches Harbor. Deleting Mara's order does not. Veto stops and asks a person. The pending id is not approval; sending it back is `pending_approval` and does not call Harbor. Approving it gives a new id. That id deletes the order once, and then the order is gone.
 

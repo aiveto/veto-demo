@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.8 - 2026-10-06
+
+- Tracks veto v0.1.8. The Harbor walk calls the customer and the invoice from `next_calls` instead of hardcoded ids.
+
 ## v0.1.7 - 2026-10-04
 
 - Tracks veto v0.1.7. Query, path, and header values are checked before HTTP. Preview keeps integer digits. CLI, JSON, and MCP are locked by one surface test.

@@ -114,6 +114,12 @@ func TestCLIJSONAndMCPHoldTheSameClaims(t *testing.T) {
 				if out.Status != "ok" || !out.HTTP || !out.Sent || !strings.Contains(out.Body, "cus_mara") {
 					t.Fatalf("orders.get %+v", out)
 				}
+				if _, ok := out.next("customers.get", "id", "cus_mara"); !ok {
+					t.Fatalf("orders.get next_calls %+v", out.NextCalls)
+				}
+				if _, ok := out.next("invoices.get", "id", "inv_2291"); !ok {
+					t.Fatalf("orders.get next_calls %+v", out.NextCalls)
+				}
 			})
 
 			t.Run("invalid_query", func(t *testing.T) {
