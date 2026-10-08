@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.12 - 2026-10-08
+
+- Tracks veto v0.1.12.
+
 ## v0.1.11 - 2026-10-08
 
 - Tracks veto v0.1.11.
