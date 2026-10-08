@@ -6,7 +6,7 @@ require github.com/modelcontextprotocol/go-sdk v1.8.0
 
 require (
 	github.com/agnivade/levenshtein v1.2.1 // indirect
-	github.com/aiveto/veto v0.1.11 // indirect
+	github.com/aiveto/veto v0.1.12 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.1 // indirect
