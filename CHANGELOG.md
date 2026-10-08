@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## v0.1.9 - 2026-10-07
+
+- Tracks veto v0.1.9.
+
 ## v0.1.8 - 2026-10-06
 
 - Tracks veto v0.1.8. The Harbor walk calls the customer and the invoice from `next_calls` instead of hardcoded ids.
