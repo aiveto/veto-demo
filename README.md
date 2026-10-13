@@ -20,8 +20,12 @@ That is what the automated walk prints. No paid service. No model API key.
 
 ## Try it
 
+**One command. Two walkthroughs.**
+
+Run the same Harbor scenario through Veto's CLI and MCP interfaces. See semantic discovery, cross-service relationships, and approval-gated execution without an AI subscription or API key.
+
 ```bash
-git clone -b demo-three-tools https://github.com/aiveto/veto-demo.git
+git clone https://github.com/aiveto/veto-demo.git
 cd veto-demo
 make demo
 ```
@@ -32,7 +36,7 @@ Requires Go 1.27.1.
 
 1. Run `make demo`.
 2. Watch the three tools, then the links from order 10482 to the customer and the invoice.
-3. Watch the delete wait until a person approves it.
+3. Watch Veto block the delete, reject an unapproved retry, then execute the operation after the walkthrough supplies a valid approval.
 
 ## What you see
 
