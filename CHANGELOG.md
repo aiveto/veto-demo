@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Open the demo on three MCP tools, and match the poster to that line.
+
 ## v0.1.12 - 2026-10-08
 
 - Tracks veto v0.1.12.

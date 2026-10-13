@@ -1,16 +1,14 @@
-<img src="docs/veto-social.png" width="1280" alt="veto makes it possible for an AI agent to call your API with context and semantics. A hundred endpoints stay 3 tools.">
+<img src="docs/veto-social.png" width="1280" alt="Your entire API platform. Just 3 MCP tools.">
 
-Imagine Harbor sells home goods. Orders, customers, and billing are the three APIs that run that business. This demo hosts them under `app/`. Veto sits in front of them. Your APIs stay where they already run.
+# Your entire API platform. Just 3 MCP tools.
+
+Harbor sells home goods. Orders, customers, and billing are three APIs and twenty-five operations. The agent gets search, describe, and invoke (`capabilities_search`, `capabilities_describe`, `capabilities_invoke`). It does not get one tool for every operation, and it never receives the OpenAPI file. This demo hosts Harbor under `app/`. Your APIs stay where they already run.
 
 ```bash
 make demo
 ```
 
 `make help` lists the other targets. That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
-
-## What veto does
-
-You point veto at your OpenAPI. The model gets three tools: search, describe, and invoke (`capabilities_search`, `capabilities_describe`, `capabilities_invoke`). It does not get one tool for every operation. The model can ask for a call. Veto decides whether it runs. A delete waits until a person says yes. The model never receives the OpenAPI file.
 
 ## The story
 
