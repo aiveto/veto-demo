@@ -81,4 +81,4 @@ Harbor listens on `127.0.0.1:18410` (orders), `:18411` (customers), and `:18412`
 
 Change a word. Add a relation. Harbor stays local. On your own APIs, veto points at the services where they already run.
 
-[Explore veto](https://github.com/aiveto/veto/blob/readme-three-tools/README.md) · [Setup guide](https://github.com/aiveto/veto/blob/readme-three-tools/docs/guide.md)
+[Explore veto](https://github.com/aiveto/veto/blob/main/README.md) · [Setup guide](https://github.com/aiveto/veto/blob/main/docs/guide.md)
