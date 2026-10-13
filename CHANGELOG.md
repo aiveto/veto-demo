@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-- Open the demo on three MCP tools, and match the poster to that line.
+- Open the demo on the Harbor walk: 25 operations, three tools, and a delete that waits.
+- Say that `make demo` is a script, and `make mcp` is the live client.
 
 ## v0.1.12 - 2026-10-08
 

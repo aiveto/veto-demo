@@ -1,45 +1,80 @@
 <img src="docs/veto-social.png" width="1280" alt="Your entire API platform. Just 3 MCP tools.">
 
-# Your entire API platform. Just 3 MCP tools.
+# Harbor. See veto in action.
 
-Harbor sells home goods. Orders, customers, and billing are three APIs and twenty-five operations. The agent gets search, describe, and invoke (`capabilities_search`, `capabilities_describe`, `capabilities_invoke`). It does not get one tool for every operation, and it never receives the OpenAPI file. This demo hosts Harbor under `app/`. Your APIs stay where they already run.
+**25 operations. 3 MCP tools.**
+
+Harbor sells home goods. Orders, customers, and billing are three OpenAPI services. An agent does not get a tool for each operation. It gets search, describe, and invoke.
+
+```text
+capabilities_search, capabilities_describe, capabilities_invoke
+Harbor publishes more than twenty operations. The agent sees these three.
+orders.get  →  customers.get   by Order.customerId
+orders.get  →  invoices.get    by Order.invoiceId
+Mara's order was read, then her customer, then her invoice.
+Cancel reached the desk. Delete did not, until a person approved it.
+The approved id ran once.
+```
+
+That is what the automated walk prints. No paid service. No model API key.
+
+## Try it
 
 ```bash
+git clone -b demo-three-tools https://github.com/aiveto/veto-demo.git
+cd veto-demo
 make demo
 ```
 
-`make help` lists the other targets. That needs Go 1.27.1. Veto is the module `github.com/aiveto/veto` in `go.mod`.
+Requires Go 1.27.1.
 
-## The story
+`make demo` is a script. It starts Harbor, plays the story through the CLI, then plays the same story through a scripted MCP client. It does not open Claude, Cursor, or ChatGPT.
 
-`make demo` runs that on Harbor twice: once over the CLI, once over MCP.
+1. Run `make demo`.
+2. Watch the three tools, then the links from order 10482 to the customer and the invoice.
+3. Watch the delete wait until a person approves it.
 
-Harbor has twenty-five operations. "Retire order" and "scrap order" both find the delete. Retire is already known. Scrap is an extra word in `app/semantics.yaml`, beside the sentence that this call waits for a person.
+## What you see
 
-Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. Reading it also reads Mara, and her paid invoice, because those links are written in `app/relations.yaml`. Search returns those related ids and `related_calls`. The invoke result names the same calls in `next_calls`, with the ids from the order. The warehouse id on the order is not a link, so nothing calls it.
+Harbor has 25 operations. The scripted MCP client is offered three tools. Search finds the call. The raw specs stay out of that list.
 
-Jonas Adler asks to cancel his linen throw, order 10490. That call reaches Harbor. Deleting Mara's order does not. Veto stops and asks a person. The pending id is not approval; sending it back is `pending_approval` and does not call Harbor. Approving it gives a new id. That id deletes the order once, and then the order is gone.
+Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. The links are written in `app/relations.yaml`:
 
-## Your turn
+`orders.get` → `customers.get` and `invoices.get`
 
-Harbor is on `127.0.0.1:18410` (orders), `:18411` (customers), and `:18412` (billing). Calls want `Authorization: Bearer demo-token`.
+The invoice is paid. The warehouse id on the order is not a relation, so nothing calls it. No guessed endpoint.
 
-| You want | Open | Run |
-| --- | --- | --- |
-| Claude, Cursor, or ChatGPT | `app/prompts/claude.md` | `make mcp` |
-| A skill, or the CLI | `app/prompts/skill.md` | `make cli` |
-| A link from one API to another | `app/relations.yaml` | |
-| The words for a call | `app/semantics.yaml` | |
-| The file that names the APIs | `app/veto.yaml` | |
-| Harbor's OpenAPI | `app/contracts/` | |
-| The process hosting the business | `app/desks/` | `make mcp` |
+Retire order 10482. Veto holds `orders.delete`. The pending id is not permission. Sending it back is `pending_approval` and does not call Harbor. `veto approve --config app/veto.yaml` prints a second id. That id runs the delete once, and then the order is gone.
 
-`make mcp` leaves the business listening and prints the config to paste into Claude, Cursor, or ChatGPT. Paste `app/prompts/claude.md` as the instruction.
+Cancel is a different call. Order 10490, Jonas Adler's linen throw, reaches Harbor without that wait.
 
-That prompt asks the agent to retire Mara's order. It reads the order, follows the customer and the invoice, and stops with an id that is only a request. Sending that pending id back is `pending_approval`. `veto approve --config app/veto.yaml` that id prints a second id. Hand the agent the second id. The delete runs once. A cancel does not wait. Ask it to cancel order 10490 if you want that from the agent.
+## Your own agent
 
-`make cli` plays the same story through `veto search`, `veto describe`, and `veto invoke`. `veto --help-json` is the contract. A skill follows `app/prompts/skill.md`. `make demo` runs the CLI walk, then the MCP walk, each against a fresh Harbor.
+`make mcp` is the other experience. It leaves Harbor listening and prints the config for a client. It does not play the story for you.
 
-## On your APIs
+```bash
+make mcp
+```
 
-Leave them where they are. Add a `veto.yaml` that names your OpenAPI, the way `app/veto.yaml` names Harbor's. Add `relations.yaml` when reading one API should call another. Add `semantics.yaml` for an extra word, the way `scrap` names the delete. Run `veto serve` for Claude, Cursor, or ChatGPT, or `veto search`, `describe`, and `invoke` for a skill. Depend on `github.com/aiveto/veto` the same way this `go.mod` does.
+1. Paste that config into Claude, Cursor, or ChatGPT.
+2. Paste `app/prompts/claude.md` as the instruction.
+3. Ask it to read Mara's order and follow the customer and the invoice.
+4. Ask it to retire the order. The pending id is only a request. Approve it, hand the agent the second id, and the delete runs once.
+
+`make cli` plays the same story through `veto search`, `veto describe`, and `veto invoke`. A skill follows `app/prompts/skill.md`.
+
+Harbor listens on `127.0.0.1:18410` (orders), `:18411` (customers), and `:18412` (billing). Calls want `Authorization: Bearer demo-token`.
+
+## The files
+
+| | |
+| --- | --- |
+| Three OpenAPI services | `app/contracts/` |
+| The catalog | `app/veto.yaml` |
+| An extra word, such as scrap for delete | `app/semantics.yaml` |
+| The links between services | `app/relations.yaml` |
+| The agent instruction | `app/prompts/claude.md` |
+
+Change a word. Add a relation. Harbor stays local. On your own APIs, veto points at the services where they already run.
+
+[Explore veto](https://github.com/aiveto/veto/blob/readme-three-tools/README.md) · [Setup guide](https://github.com/aiveto/veto/blob/readme-three-tools/docs/guide.md)
