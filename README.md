@@ -1,4 +1,4 @@
-<img src="docs/veto-social.png" width="1280" alt="Your entire API platform. Just 3 MCP tools.">
+<img src="docs/veto-social.png" width="1280" alt="Your entire API platform. Just 3 MCP tools. OpenAPI to MCP, CLI, and SDK. Semantic discovery, connected APIs, and human approvals.">
 
 # Harbor. See veto in action.
 
