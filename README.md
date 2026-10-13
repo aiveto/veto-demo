@@ -12,8 +12,8 @@ Harbor publishes more than twenty operations. The agent sees these three.
 orders.get  →  customers.get   by Order.customerId
 orders.get  →  invoices.get    by Order.invoiceId
 Mara's order was read, then her customer, then her invoice.
-Cancel reached the desk. Delete did not, until a person approved it.
-The approved id ran once.
+The invoice is paid. Delete waits until a person approves it.
+That approval runs once.
 ```
 
 That is what the automated walk prints. No paid service. No model API key.
@@ -22,7 +22,7 @@ That is what the automated walk prints. No paid service. No model API key.
 
 **One command. Two walkthroughs.**
 
-Run the same Harbor scenario through Veto's CLI and MCP interfaces. See semantic discovery, cross-service relationships, and approval-gated execution without an AI subscription or API key.
+Run the same Harbor scenario through the CLI and through MCP. See search find the call, the links between services, and a delete that waits. No AI subscription. No model API key.
 
 ```bash
 git clone https://github.com/aiveto/veto-demo.git
@@ -48,9 +48,9 @@ Order 10482 is Mara Ellison's wool coat and two cedar trays, $556. The links are
 
 The invoice is paid. The warehouse id on the order is not a relation, so nothing calls it. No guessed endpoint.
 
-Retire order 10482. Veto holds `orders.delete`. The pending id is not permission. Sending it back is `pending_approval` and does not call Harbor. `veto approve --config app/veto.yaml` prints a second id. That id runs the delete once, and then the order is gone.
+Retire order 10482. Veto holds `orders.delete`. The order stays until a person approves it. The first id is the request. Sending it back is `pending_approval` and does not call Harbor. `veto approve --config app/veto.yaml` prints a second id. That id runs the delete once, and then the order is gone.
 
-Cancel is a different call. Order 10490, Jonas Adler's linen throw, reaches Harbor without that wait.
+Cancel order 10490, Jonas Adler's linen throw, runs when it is asked.
 
 ## Your own agent
 
@@ -74,7 +74,7 @@ Harbor listens on `127.0.0.1:18410` (orders), `:18411` (customers), and `:18412`
 | | |
 | --- | --- |
 | Three OpenAPI services | `app/contracts/` |
-| The catalog | `app/veto.yaml` |
+| The veto config | `app/veto.yaml` |
 | An extra word, such as scrap for delete | `app/semantics.yaml` |
 | The links between services | `app/relations.yaml` |
 | The agent instruction | `app/prompts/claude.md` |
